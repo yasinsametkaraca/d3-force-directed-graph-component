@@ -68,14 +68,16 @@
             .data(data.links)
             .enter()
             .append("line")
-            .attr("class", "link");
+            .attr("class", "link")
+            .join("line")
+            .attr("stroke-width", d => Math.sqrt(d.value));
 
         const node = nodeGroup.selectAll(".node")
             .data(data.nodes)
             .enter()
             .append("circle")
             .attr("class", "node")
-            .attr("r", 5) //node size
+            .attr("r", d => d.size) //node size
             .attr("fill", d => color(d.group))
             .call(drag(simulation));
 
