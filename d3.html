@@ -11,6 +11,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vh;
             overflow: hidden;
         }
         .svg-content {
@@ -28,13 +29,18 @@
             font-size: 10px;
             text-anchor: middle;
         }
+        .occluded { opacity:0.00001; }
+        svg g text {
+            text-anchor: middle;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12 svg-container">
-            <div class="svg-content">
+            <div class="svg-content border">
                 <svg id="graph"></svg>
             </div>
         </div>
@@ -43,8 +49,8 @@
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    const width = window.innerWidth * 0.9;
-    const height = window.innerHeight * 0.9;
+    const width = window.innerWidth * 1;
+    const height = window.innerHeight * 1;
 
     const svg = d3.select("#graph")
         .attr("width", width)
@@ -56,7 +62,17 @@
     const nodeGroup = svg.append("g")
         .attr("class", "nodes");
 
+    function degree(links, id)
+    {
+        return links.filter(n => n.source === id || n.target === id).length;
+    }
+
     d3.json("miserables.json").then(function(data) {
+
+        data = ({
+            links: data.links,
+            nodes: data.nodes.map(n => Object.assign({ label: n.id, priority: degree(data.links, n.id) }, n))
+        })
         const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         const simulation = d3.forceSimulation(data.nodes)
