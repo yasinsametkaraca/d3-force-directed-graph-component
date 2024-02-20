@@ -73,10 +73,11 @@ d3.json("miserables.json").then(function(data) {
         console.log("Tıklanan Node:", d.label);
         const pinnedNodesList = d3.select("#pinnednodeslist ul");
         const clickedItem = pinnedNodesList.selectAll("li").filter(function(data) {
+            console.log(data.label, d.label);
             return data.label === d.label;
         });
         if (!clickedItem.empty()) {
-            clickedItem.remove(); // Eğer listede varsa, tıklanan node'u listeden kaldır
+            clickedItem.remove();
         } else {
             showNodeLabel(d);
         }
@@ -86,7 +87,9 @@ d3.json("miserables.json").then(function(data) {
     function showNodeLabel(d) {
         const pinnedNodesList = d3.select("#pinnednodeslist ul");
 
-        const listItem = pinnedNodesList.append("li");
+        const listItem = pinnedNodesList.append("li")
+            .datum(d);
+
         listItem.append("a")
             .attr("href", "#")
             .text(d.label)
