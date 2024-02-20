@@ -43,7 +43,10 @@ d3.json("miserables.json").then(function(data) {
         .attr("class", "node")
         .attr("r", d => d.size) //node size
         .attr("fill", d => color(d.group))
-        .call(drag(simulation));
+        .call(drag(simulation))
+        .on("click", focusNode)
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut);
 
     const nodeText = nodeGroup.selectAll(".node-text")
         .data(data.nodes)
@@ -55,16 +58,57 @@ d3.json("miserables.json").then(function(data) {
 
     simulation.on("tick", () => {
         link.attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
         node.attr("cx", d => d.x)
-        .attr("cy", d => d.y);
+            .attr("cy", d => d.y);
 
         nodeText.attr("x", d => d.x)
-        .attr("y", d => d.y);
+            .attr("y", d => d.y);
     });
+
+    function focusNode(event, d) {
+        console.log("Tıklanan Node:", d.label);
+        const pinnedNodesList = d3.select("#pinnednodeslist ul");
+        const clickedItem = pinnedNodesList.selectAll("li").filter(function(data) {
+            return data.label === d.label;
+        });
+        if (!clickedItem.empty()) {
+            clickedItem.remove(); // Eğer listede varsa, tıklanan node'u listeden kaldır
+        } else {
+            showNodeLabel(d);
+        }
+        event.stopPropagation();
+    }
+
+    function showNodeLabel(d) {
+        const pinnedNodesList = d3.select("#pinnednodeslist ul");
+
+        const listItem = pinnedNodesList.append("li");
+        listItem.append("a")
+            .attr("href", "#")
+            .text(d.label)
+            .on("click", function() {
+                listItem.remove();
+            });
+    }
+
+    d3.select("#pinnednodeslist ul").on("click", "li", function() {
+        d3.select(this).remove();
+    });
+
+    function handleMouseOver(event, d) {
+        d3.select(this).style("fill", "black");
+        d3.select(this).select("text").style("fill", "white");
+    }
+
+    function handleMouseOut(event, d) {
+        d3.select(this).style("fill", color(d.group));
+        d3.select(this).select("text").style("fill", "black");
+    }
+
 });
 
 function drag(simulation) {
