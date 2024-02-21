@@ -88,7 +88,7 @@ d3.json("miserables.json").then(function(data) {
         const pinnedNodesList = d3.select("#pinnednodeslist ul");
 
         const listItem = pinnedNodesList.append("li")
-            .datum(d);
+            .datum(d)
 
         listItem.append("a")
             .attr("href", "#")
